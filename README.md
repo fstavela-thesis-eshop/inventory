@@ -1,0 +1,2 @@
+# inventory
+E-shop inventory
