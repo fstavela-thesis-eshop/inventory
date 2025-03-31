@@ -7,6 +7,7 @@ class ProductBase(BaseModel):
     name: str
     description: str
     category_id: UUID
+    price: float
 
     class Config:
         extra = "forbid"
@@ -21,6 +22,15 @@ class ProductUpdate(BaseModel):
     description: str | None = None
     category_id: UUID | None = None
     stock_quantity: int | None = None
+    price: float | None = None
+
+    class Config:
+        extra = "forbid"
+
+
+class ProductQuantityUpdate(BaseModel):
+    id: UUID
+    stock_quantity_dif: int
 
     class Config:
         extra = "forbid"

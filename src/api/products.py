@@ -16,6 +16,7 @@ from db.models import Category
 from db.models import Product
 from db.session import get_db
 from schemas.product_schemas import ProductCreate
+from schemas.product_schemas import ProductQuantityUpdate
 from schemas.product_schemas import ProductResponse
 from schemas.product_schemas import ProductUpdate
 
@@ -93,6 +94,7 @@ def create_product(
         description=input_product.description,
         category_id=input_product.category_id,
         stock_quantity=input_product.stock_quantity or 0,
+        price=input_product.price,
     )
 
     try:
@@ -110,7 +112,7 @@ def create_product(
 
 
 @products_router.patch(
-    "/{product_id}",
+    "/update/{product_id}",
     response_model=ProductResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {},
@@ -180,66 +182,42 @@ def delete_product(
     db.commit()
 
 
-@products_router.put(
-    "/{product_id}/stock/{quantity}",
-    response_model=ProductResponse,
-    responses={status.HTTP_403_FORBIDDEN: {}, status.HTTP_404_NOT_FOUND: {}},
-)
-def increase_stock_quantity(
-    product_id: UUID,
-    quantity: int,
-    x_is_admin: Annotated[bool, Header()],
-    db: Annotated[Session, Depends(get_db)],
-) -> Product:
-    if not x_is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="You don't have admin rights"
-        )
-
-    db_product = db.get(Product, product_id)
-    if not db_product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
-        )
-
-    db_product.stock_quantity += quantity
-    db.commit()
-    db.refresh(db_product)
-    return db_product
-
-
-@products_router.delete(
-    "/{product_id}/stock/{quantity}",
-    response_model=ProductResponse,
+@products_router.patch(
+    "/stock",
+    response_model=list[ProductResponse],
     responses={
         status.HTTP_400_BAD_REQUEST: {},
         status.HTTP_403_FORBIDDEN: {},
         status.HTTP_404_NOT_FOUND: {},
     },
 )
-def decrease_stock_quantity(
-    product_id: UUID,
-    quantity: int,
+def change_stock_quantity(
+    input_products: list[ProductQuantityUpdate],
     x_is_admin: Annotated[bool, Header()],
     db: Annotated[Session, Depends(get_db)],
-) -> Product:
+) -> list[Product]:
     if not x_is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="You don't have admin rights"
         )
 
-    db_product = db.get(Product, product_id)
-    if not db_product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
-        )
+    db_products = []
+    for input_product in input_products:
+        db_product = db.get(Product, input_product.id)
+        if not db_product:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Product not found: {input_product.id}",
+            )
 
-    if db_product.stock_quantity < quantity:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, detail="Not enough product in stock"
-        )
+        if db_product.stock_quantity + input_product.stock_quantity_dif < 0:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail=f"Not enough product in stock: {input_product.id}",
+            )
 
-    db_product.stock_quantity -= quantity
+        db_product.stock_quantity += input_product.stock_quantity_dif
+        db_products.append(db_product)
+
     db.commit()
-    db.refresh(db_product)
-    return db_product
+    return db_products

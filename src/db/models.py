@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from sqlalchemy import UUID
 from sqlalchemy import Column
+from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
@@ -21,6 +22,7 @@ class Product(Base):  # type: ignore[valid-type, misc]
     )
     name = Column(String(64), nullable=False, unique=True, index=True)
     description = Column(String(1024))
+    price = Column(Float, nullable=False)
     stock_quantity = Column(Integer, nullable=False, default=0)
 
 
