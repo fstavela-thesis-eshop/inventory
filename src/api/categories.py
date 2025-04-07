@@ -5,13 +5,13 @@ from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Header
 from fastapi import HTTPException
 from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from api.helpers import HeaderNoSchema
 from db.models import Category
 from db.session import get_db
 from schemas.category_schemas import CategoryBase
@@ -64,7 +64,7 @@ def get_category(
 )
 def create_category(
     input_category: CategoryBase,
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> Category:
     if not x_is_admin:
@@ -103,7 +103,7 @@ def create_category(
 def update_category(
     category_id: UUID,
     input_category: CategoryUpdate,
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> Category:
     if not x_is_admin:
@@ -144,7 +144,7 @@ def update_category(
 )
 def delete_category(
     category_id: UUID,
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> None:
     if not x_is_admin:

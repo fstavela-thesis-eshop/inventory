@@ -5,13 +5,13 @@ from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Header
 from fastapi import HTTPException
 from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from api.helpers import HeaderNoSchema
 from db.models import Category
 from db.models import Product
 from db.session import get_db
@@ -81,7 +81,7 @@ def get_product(
 )
 def create_product(
     input_product: ProductCreate,
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> Product:
     if not x_is_admin:
@@ -123,7 +123,7 @@ def create_product(
 def update_product(
     product_id: UUID,
     input_product: ProductUpdate,
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> Product:
     if not x_is_admin:
@@ -164,7 +164,7 @@ def update_product(
 )
 def delete_product(
     product_id: UUID,
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> None:
     if not x_is_admin:
@@ -193,7 +193,7 @@ def delete_product(
 )
 def change_stock_quantity(
     input_products: list[ProductQuantityUpdate],
-    x_is_admin: Annotated[bool, Header()],
+    x_is_admin: Annotated[bool, HeaderNoSchema()],
     db: Annotated[Session, Depends(get_db)],
 ) -> list[Product]:
     if not x_is_admin:
