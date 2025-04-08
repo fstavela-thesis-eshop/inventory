@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from pydantic import BaseModel
+from pydantic import ConfigDict
 
 
 class ProductBase(BaseModel):
@@ -9,8 +10,7 @@ class ProductBase(BaseModel):
     category_id: UUID
     price: float
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class ProductCreate(ProductBase):
@@ -24,16 +24,14 @@ class ProductUpdate(BaseModel):
     stock_quantity: int | None = None
     price: float | None = None
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class ProductQuantityUpdate(BaseModel):
     id: UUID
     stock_quantity_dif: int
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class ProductResponse(ProductBase):

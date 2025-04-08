@@ -102,6 +102,7 @@ def create_product(
         db.commit()
     except IntegrityError as err:
         logger.error(f"Error while creating a new product: {err.args}")
+        db.rollback()
         err_message = err.args[0].split("\n")[-2]
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=err_message
@@ -145,6 +146,7 @@ def update_product(
         db.commit()
     except IntegrityError as err:
         logger.error(f"Error while updating a product: {err.args}")
+        db.rollback()
         err_message = err.args[0].split("\n")[-2]
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=err_message
@@ -205,12 +207,14 @@ def change_stock_quantity(
     for input_product in input_products:
         db_product = db.get(Product, input_product.id)
         if not db_product:
+            db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Product not found: {input_product.id}",
             )
 
         if db_product.stock_quantity + input_product.stock_quantity_dif < 0:
+            db.rollback()
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
                 detail=f"Not enough product in stock: {input_product.id}",

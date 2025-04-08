@@ -82,6 +82,7 @@ def create_category(
         db.commit()
     except IntegrityError as err:
         logger.error(f"Error while creating a new category: {err.args}")
+        db.rollback()
         err_message = err.args[0].split("\n")[-2]
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=err_message
@@ -125,6 +126,7 @@ def update_category(
         db.commit()
     except IntegrityError as err:
         logger.error(f"Error while updating a category: {err.args}")
+        db.rollback()
         err_message = err.args[0].split("\n")[-2]
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=err_message

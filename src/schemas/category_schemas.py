@@ -1,22 +1,21 @@
 from uuid import UUID
 
 from pydantic import BaseModel
+from pydantic import ConfigDict
 
 
 class CategoryBase(BaseModel):
     name: str
     description: str
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class CategoryUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class CategoryResponse(CategoryBase):
