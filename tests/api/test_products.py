@@ -115,7 +115,7 @@ def test_get_products_by_category_name(
     api_client: TestClient, mock_db: MagicMock, mocker: MockerFixture, is_admin: bool
 ) -> None:
     mock_category = generate_random_db_category()
-    mock_product = generate_random_db_product(category_id=mock_category.id)
+    mock_product = generate_random_db_product(category_id=mock_category.id)  # type: ignore[arg-type]
 
     mock_return = mocker.Mock()
 
@@ -123,7 +123,7 @@ def test_get_products_by_category_name(
         assert str(query.compile()) == str(
             select(Category.id).where(Category.name == mock_category.name).compile()
         )
-        return mock_category.id  # type: ignore[no-any-return]
+        return mock_category.id  # type: ignore[return-value]
 
     def _scalars(query: Select[Product]) -> mocker.Mock:
         assert str(query.compile()) == str(

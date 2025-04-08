@@ -146,7 +146,7 @@ def test_get_category_correct(
 
     def _get_product(_: Any, input_category_id: UUID) -> Category:
         assert input_category_id == mock_category.id
-        return mock_category  # type: ignore[no-any-return]
+        return mock_category
 
     mock_db.get = _get_product
 
@@ -278,7 +278,7 @@ def test_update_category_db_error(api_client: TestClient, mock_db: MagicMock) ->
 
     def _get_category(_: Any, category_id: str) -> Category:
         assert category_id == mock_category.id
-        return mock_category  # type: ignore[no-any-return]
+        return mock_category
 
     mock_db.get = _get_category
 
@@ -303,7 +303,7 @@ def test_update_category_correct(api_client: TestClient, mock_db: MagicMock) -> 
 
     def _get_category(_: Any, category_id: str) -> Category:
         assert category_id == mock_category.id
-        return mock_category  # type: ignore[no-any-return]
+        return mock_category
 
     mock_db.get = _get_category
 
@@ -363,7 +363,7 @@ def test_delete_category_correct(api_client: TestClient, mock_db: MagicMock) -> 
 
     def _get_category(_: Any, category_id: str) -> Category:
         assert category_id == mock_category.id
-        return mock_category  # type: ignore[no-any-return]
+        return mock_category
 
     def _delete_category(category: Category) -> None:
         assert category == mock_category

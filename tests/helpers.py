@@ -8,7 +8,7 @@ from typing import Any
 from uuid import UUID
 from uuid import uuid4
 
-from db.models import Category
+from src.db.models import Category
 from src.db.models import Product
 
 EXPECTED_PRODUCT_RESPONSE_FIELDS = {
