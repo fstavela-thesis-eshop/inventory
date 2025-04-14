@@ -295,17 +295,15 @@ def test_create_product_correct(api_client: TestClient, mock_db: MagicMock) -> N
 
     def _add_product(product: Product) -> None:
         validate_db_product(product, product_data)
-
-    def _db_refresh(product: Product) -> None:
-        product.id = uuid4()  # type: ignore[assignment]
         expected_products.append(product)
 
     mock_db.add = _add_product
-    mock_db.refresh = _db_refresh
 
     response = api_client.post(
         "/products/create", json=product_data, headers=gen_headers(True)
     )
+
+    mock_db.commit.assert_called_once()
 
     assert response.status_code == 201
     response_json = response.json()
@@ -350,7 +348,7 @@ def test_create_product_additional_field(api_client: TestClient) -> None:
 def test_create_product_db_error(api_client: TestClient, mock_db: MagicMock) -> None:
     product_data = generate_create_product_data()
 
-    mock_db.commit.side_effect = IntegrityError(
+    mock_db.add.side_effect = IntegrityError(
         statement="DB error", params=None, orig=BaseException("DB error\nVery serious")
     )
 

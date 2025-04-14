@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 from typing import cast
 from uuid import UUID
+from uuid import uuid4
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -90,6 +91,7 @@ def create_product(
         )
 
     db_product = Product(
+        id=uuid4(),
         name=input_product.name,
         description=input_product.description,
         category_id=input_product.category_id,
@@ -99,7 +101,6 @@ def create_product(
 
     try:
         db.add(db_product)
-        db.commit()
     except IntegrityError as err:
         logger.error(f"Error while creating a new product: {err.args}")
         db.rollback()
@@ -108,7 +109,6 @@ def create_product(
             status_code=status.HTTP_400_BAD_REQUEST, detail=err_message
         ) from err
 
-    db.refresh(db_product)
     return db_product
 
 
